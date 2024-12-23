@@ -1,0 +1,39 @@
+﻿@using Reservations.Backend.Models
+@using Reservations.Client.Service
+
+@inject NavigationManager NavManager
+
+<div class="col-sm-3 col-6 mt-3">
+    <div class="card game-card">
+        <div class="card-body text-center">
+            <h5 class="card-title">@Table.Name</h5>
+            <ul>
+                @foreach (var item in Shifts)
+                {
+                    <li>
+                        <NavLink class="header-exit text-decoration-none" @onclick="() => EditReservations(item.Id)" href="#">@item.Name</NavLink>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public List<Shift> Shifts { get; set; }
+    [Parameter]
+    public RestaurantTable Table { get; set; }
+    [Parameter]
+    public List<Reservation> Reservations { get; set; }
+    [Parameter]
+    public DateOnly ReservationsDate { get; set; }
+
+    void EditReservations(int shiftId)
+    {
+        NavManager.NavigateTo("/EditReservation/" + shiftId.ToString() + "/" + Table.Id.ToString() + "/" + ReservationsDate.ToString("yyyy-MM-dd"));
+    }
+
+    
+}

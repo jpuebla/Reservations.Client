@@ -1,0 +1,42 @@
+﻿@page "/EditReservation/{ShiftId:int}/{TableId:int}/{ReservationsDateString}"
+@page "/EditReservation/{ShiftId:int}/{ReservationsDateString}"
+
+@using Reservations.Backend.Models
+@using Reservations.Client.Service
+
+@inject IReservationService ReservationService
+
+<h3>Edit Reservations</h3>
+
+@foreach (var item in Reservations)
+{
+    <p>@item.Description</p>
+}
+
+<div class="row">
+    <div class="col-2">
+    <button class="btn btn-primary btn-sm">Add Reservation</button>
+    </div>
+</div>
+
+
+@code
+{
+
+    [Parameter]
+    public int ShiftId { get; set; }
+    [Parameter]
+    public int? TableId { get; set; }        
+    [Parameter]
+    public string ReservationsDateString { get; set; }
+
+    DateOnly ReservationsDate { get; set; }
+
+    List<Reservation> Reservations { get; set; } = new List<Reservation>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ReservationsDate = DateOnly.ParseExact(ReservationsDateString, "yyyy-MM-dd");
+        Reservations = await ReservationService.GetReservations(ReservationsDate, ShiftId, TableId);
+    }
+}

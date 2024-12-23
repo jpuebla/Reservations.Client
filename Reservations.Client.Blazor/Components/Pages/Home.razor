@@ -1,0 +1,57 @@
+﻿@page "/"
+@using Reservations.Backend.Models
+@using Reservations.Client.Service
+@using Reservations.Client.Blazor.Components
+
+@inject IReservationService ReservationService
+
+<PageTitle>Home</PageTitle>
+
+<h1>Restaurant reservations manager</h1>
+
+<div class="row mt-4">
+<h3>Select date:</h3>
+
+    <div class="col-2">
+        <InputDate TValue="DateOnly" class="form-control form-control-sm" ValueChanged="(value) => DateChange(value)" ValueExpression="() => ReservationsDate" Value="ReservationsDate" />
+    </div>
+</div>
+
+<div class="row mt-4">
+<h3>TABLES:</h3>
+</div>
+
+<div class="row">
+@{
+    if (Tables != null)
+    {
+        foreach (var item in Tables)
+        {
+            <RestaurantTableComponent Reservations="Reservations" Shifts="Shifts" Table="item" ReservationsDate="ReservationsDate" />
+        }
+    }
+}
+</div>
+
+@code
+{
+    public List<Shift> Shifts { get; set; }
+    public List<RestaurantTable>? Tables { get; set; }
+    public List<Reservation> Reservations { get; set; }
+
+    private DateOnly ReservationsDate { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ReservationsDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        Shifts = await ReservationService.GetShifts();
+        Tables = await ReservationService.GetTables();
+        Reservations = await ReservationService.GetReservations(ReservationsDate, null, null);
+    }
+
+    async Task DateChange(DateOnly date)
+    {
+        ReservationsDate = date;
+        Reservations = await ReservationService.GetReservations(ReservationsDate, null, null);
+    }
+}
